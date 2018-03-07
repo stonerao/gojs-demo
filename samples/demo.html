@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shop Floor Monitor</title>
+  <meta name="description" content="A state monitoring diagram." />
+  <!-- Copyright 1998-2018 by Northwoods Software Corporation. -->
+  <meta charset="UTF-8">
+  <script src="../release/go.js"></script>
+  <script id="code">
+  </script>
+</head>
+<script>
+  var jsonList = {
+       nodeKeyProperty: "key",
+       nodeDataArray: [{key:1,text:"节点a"},{key:2,text:"节点b"},{key:3,text:"节点c"}],
+       linkDataArray: [{from:1,to:2,text:"我是节点a指向节点b"},{from:2,to:3,text:"我是节点b指向节点c"},{from:3,to:1,text:"我是节点c指向节点a"}]
+  };
+  const init = () => {
+    /* 引入 */
+    var $ = go.GraphObject.make;
+    /* 建立一个画布 */
+    var myDiagram = $(go.Diagram, "myDiagramDiv", {
+      initialAutoScale: go.Diagram.Uniform,
+      /* 是否缩放 */
+      contentAlignment: go.Spot.Center,
+      "undoManager.isEnabled": true ,
+      /* 画布定位 */
+      layout: $(go.ForceDirectedLayout, {
+        defaultSpringLength: 30,
+        defaultElectricalCharge: 100
+      }) /*  代表画布里的元素布局方式，采用了力导图自然排列。 */
+    });
+    /* 在go里面创建一个text文本 并且填充了一系列的属性 */
+    $(go.TextBlock, {
+      text: "www.peng8.net",
+      stroke: "red",
+      font: "bold 10pt helvetica, bold arial, sans-serif",
+      margin: 4
+    })
+    /* 
+     * 定义一个节点模板
+     * 
+     */
+    myDiagram.nodeTemplate = $(go.Node, "Auto",
+      /* 形状  go.Shape 圆角矩形*/
+      $(go.Shape, "RoundedRectangle", {
+          fill: "white",
+          stroke: "red"
+        },
+        new go.Binding("fill", "color")
+      ),
+      /* 文本对象 */
+      $(go.TextBlock, {
+          font: "bold 10pt helvetica, bold arial, sans-serif",
+          margin: 4
+        },
+        new go.Binding("text", "text"))
+    );
+    /* 构造链接到一起的线 */
+    myDiagram.linkTemplate =
+      $(go.Link, {
+          adjusting: go.Link.Stretch,
+          reshapable: true
+        },
+        new go.Binding("points").makeTwoWay(),
+
+        //new go.Binding("curviness", "curviness"),
+        $(go.Shape, {
+          isPanelMain: true,
+          stroke: "black"
+        }),
+        $(go.Shape, {
+          toArrow: "standard",
+          stroke: null
+        }), 
+        $(go.TextBlock, {
+            textAlign: "center",
+            segmentOffset: new go.Point(0, -10),
+            font: "10pt helvetica, arial, sans-serif",
+            stroke: "#555555",
+            margin: 4
+          },
+          new go.Binding("text", "text")
+        )
+      );
+      myDiagram.model = go.Model.fromJson(jsonList);
+          
+  }
+</script>
+
+<body onload="init()">
+  <div id="sample">
+    <div id="myDiagramDiv" style="border: solid 1px black; width:80%; height:400px"></div>
+    <div id="DiagramDiv"  style="border: solid 1px black; width:20%; height:400px"></div>
+
+    <p>
+      For another monitoring example, see the
+      <a href="kittenMonitor.html">Kitten Monitor</a> sample.
+    </p>
+  </div>
+</body>
+
+</html>
